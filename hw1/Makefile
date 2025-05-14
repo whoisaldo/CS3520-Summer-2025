@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra
 
-# List all your hw1 source files here
+# List all hw1 source files here
 ALL_SRCS = q1_debug.cpp file1.cpp file2.cpp file3.cpp
 ALL_PROGS = $(ALL_SRCS:.cpp=)
 
