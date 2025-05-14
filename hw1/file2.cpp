@@ -1,41 +1,39 @@
-// Automatic dialing machine
-// Delivers a sales message
-/* Needs to print all possible combinations of areacode and exchangecode with the last 4 digits
-Example : If areacode = 617, exchange = 424
-Output : 
-"I am calling to tell you to buy a subscription to Dogs Monthly Magazine!"
-617-424-0001
-617-424-0002
-617-424-0003
-...
-617-424-9998
-617-424-9999
-*/
+/*
+ * Q1B – Bugs fixed in file2.cpp:
+ *  1. Missing opening quote on the first prompt.
+ *  2. Mis‑typed stream operator and variable for reading areaCode/exchange.
+ *  3. Missing semicolon after the second prompt.
+ *  4. Loop headers used colons/commas instead of semicolons.
+ *  5. Declared digit variables as char and did a complex nested loop → replaced with a single numeric loop.
+ *  6. Incorrect cout syntax (`cout<< digit1,digit2…`) → now uses iomanip for zero‑padding.
+ *  7. Printed the subscription message inside the loop instead of once before it.
+ *  8. main returned nothing → changed to `return 0;`.
+ */
 
-// Check for possible compiler errors, logical errors and rectify them
-// Re-factor the code by adding few comments (make it readable) and
-// provide list of most important fixes (in comments)
+#include <iostream>
+#include <iomanip>
+using namespace std;
 
-#include<iostream>
-  
-int main(){
-   char digit1, digit2, digit3, digit4;
-   int areaCode, exchange;
-   std::cout<< "Hello, I am a telemarketing calling making program.\n";
-   std::cout<< Enter a three-digit area code ";
-   cin<<exchange;
-   std::cout<<"Enter a three-digit exchange to call "
-   std::cin>>areaCode;
-   for(digit1 = 0: digit1 <= 10: ++digit2){
-        for(digit2 = 9, digit2 >=0, --digit3){
-            while(digit3 = 0. digit3 < 10. ++digit3)
-                cout<< "Dialing ("<< areaCode<<") "<< exchange<<" - ";
-                cout<< digit1,digit2<<digit3<<digit4<<endl;
-                cout<< "I am calling to tell you to buy a subscription to Dogs Monthly!\n");
-            }
-        }
+int main() {
+    int areaCode, exchange;
+
+    cout << "Hello, I am a telemarketing calling program.\n";
+    cout << "Enter a three‑digit area code: ";
+    cin  >> areaCode;
+    cout << "Enter a three‑digit exchange to call: ";
+    cin  >> exchange;
+
+    // Print the sales message once
+    cout << "\nI am calling to tell you to buy a subscription to Dogs Monthly Magazine!\n\n";
+
+    // Print every number from 0001 to 9999 with leading zeros
+    for (int num = 1; num <= 9999; ++num) {
+        cout << setw(3) << setfill('0') << areaCode << '-'
+             << setw(3) << setfill('0') << exchange << '-'
+             << setw(4) << setfill('0') << num
+             << "\n";
     }
-    
-   std::cout<< "\nCalls completed"<<endl;
-   return;
+
+    cout << "\nCalls completed\n";
+    return 0;
 }
