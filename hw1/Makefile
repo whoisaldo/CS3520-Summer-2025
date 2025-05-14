@@ -1,17 +1,64 @@
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra
+# Directory for headers (none used here)
+IDIR = .
 
-# List all your hw1 source files here
-ALL_SRCS = q1_debug.cpp file1.cpp file2.cpp file3.cpp q2_compound.cpp q3_stats.cpp q4_replace.cpp
-ALL_PROGS = $(ALL_SRCS:.cpp=)
+# Compiler and flags
+CC     = g++
+CFLAGS = -I$(IDIR) -std=c++17 -Wall -Wextra
 
-# Default target: build all programs
-all: $(ALL_PROGS)
+# Output directory for object files (same as src)
+ODIR   = .
 
-# Pattern rule: compile each .cpp into an executable of the same name
-%: %.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@
+# Libraries (none needed)
+LIBS   =
 
-# Clean up executables
+# Dependencies (none)
+_DEPS =
+DEPS  = $(patsubst %,$(IDIR)/%,$(_DEPS))
+
+# Object file names
+_OBJ1 = file1.o
+_OBJ2 = file2.o
+_OBJ3 = file3.o
+_OBJ4 = q2_compound.o
+_OBJ5 = q4_replace.o
+_OBJ6 = q3_stats.o
+_OBJ7 = q1_debug.o
+
+# Pattern rule: compile each .cpp into .o
+$(ODIR)/%.o: %.cpp $(DEPS)
+<tab>$(CC) -c -o $@ $< $(CFLAGS)
+
+# Default target builds all executables
+all: q1_debug file1 file2 file3 q2_compound q3_stats q4_replace
+
+# Link each executable
+q1_debug: $(_OBJ7)
+<tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+file1: $(_OBJ1)
+<tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+file2: $(_OBJ2)
+<tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+file3: $(_OBJ3)
+<tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+q2_compound: $(_OBJ4)
+<tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+q3_stats: $(_OBJ6)
+<tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+q4_replace: $(_OBJ5)
+<tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+
 clean:
-	rm -f $(ALL_PROGS)
+<tab>rm -f *~ core $(IDIR)/*~ 
+<tab>rm -f q1_debug file1 file2 file3 q2_compound q3_stats q4_replace
+<tab>rm -f *.o
+
+etags:
+<tab>find . -type f -iname "*.[ch]" | xargs etags --append
