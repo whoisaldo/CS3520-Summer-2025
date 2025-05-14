@@ -1,0 +1,25 @@
+Q5 – 12‑bit Two’s‑Complement Representations
+
+1. –13
+   +13 in binary:    0000 0000 1101
+   invert bits:      1111 1111 0010
+   add 1:            1111 1111 0011
+   → 111111110011
+
+2. 56
+   56 = 32+16+8 →    0000 0011 1000
+   → 000000111000
+
+3. –1
+   +1:               0000 0000 0001
+   invert bits:      1111 1111 1110
+   add 1:            1111 1111 1111
+   → 111111111111
+
+4. –2048
+   Most negative:    1000 0000 0000
+   → 100000000000
+
+5. 2048
+   Out of range for 12 bits (can only represent –2048…+2047)
+   → N/A
