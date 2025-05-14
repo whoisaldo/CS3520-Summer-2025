@@ -1,16 +1,20 @@
-CC      = g++
-CFLAGS  = -std=c++17 -Wall -Wextra
+# Compiler settings
+CXX      = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra
 
-ALL_SRCS  = q1_debug.cpp file1.cpp file2.cpp file3.cpp q2_compound.cpp q3_stats.cpp q4_replace.cpp
-ALL_PROGS = $(ALL_SRCS:.cpp=)
+# List all your source files here
+SRCS     = q1_debug.cpp file1.cpp file2.cpp file3.cpp q2_compound.cpp q3_stats.cpp q4_replace.cpp
+PROGS    = $(SRCS:.cpp=)
 
-# Default target: build all executables
-all: $(ALL_PROGS)
+.PHONY: all clean
 
-# Pattern rule: compile each .cpp into an executable of the same name
+# Default target builds every program
+all: $(PROGS)
+
+# Generic rule: build <name> from <name>.cpp
 %: %.cpp
-<TAB>$(CC) $(CFLAGS) $< -o $@
+<TAB>$(CXX) $(CXXFLAGS) $< -o $@
 
-# Remove all generated files
+# Remove everything you just built
 clean:
-<TAB>rm -f $(ALL_PROGS) *.o
+<TAB>rm -f $(PROGS) *.o
