@@ -1,64 +1,50 @@
-# Directory for headers (none used here)
+# Directory for headers (none here)
 IDIR = .
 
 # Compiler and flags
 CC     = g++
 CFLAGS = -I$(IDIR) -std=c++17 -Wall -Wextra
 
-# Output directory for object files (same as src)
+# Output directory for objects (same as src)
 ODIR   = .
 
-# Libraries (none needed)
+# Libraries (none)
 LIBS   =
 
-# Dependencies (none)
-_DEPS =
-DEPS  = $(patsubst %,$(IDIR)/%,$(_DEPS))
+# Source files and object names
+_SRCS  = q1_debug.cpp file1.cpp file2.cpp file3.cpp q2_compound.cpp q3_stats.cpp q4_replace.cpp
+_OBJS  = $(patsubst %.cpp,$(ODIR)/%.o,$(_SRCS))
 
-# Object file names
-_OBJ1 = file1.o
-_OBJ2 = file2.o
-_OBJ3 = file3.o
-_OBJ4 = q2_compound.o
-_OBJ5 = q4_replace.o
-_OBJ6 = q3_stats.o
-_OBJ7 = q1_debug.o
-
-# Pattern rule: compile each .cpp into .o
-$(ODIR)/%.o: %.cpp $(DEPS)
+# Pattern rule to compile .cpp → .o
+$(ODIR)/%.o: %.cpp
 <tab>$(CC) -c -o $@ $< $(CFLAGS)
 
-# Default target builds all executables
+# Default: build all executables
 all: q1_debug file1 file2 file3 q2_compound q3_stats q4_replace
 
-# Link each executable
-q1_debug: $(_OBJ7)
+# Link rules
+q1_debug: $(ODIR)/q1_debug.o
 <tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-file1: $(_OBJ1)
+file1:    $(ODIR)/file1.o
 <tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-file2: $(_OBJ2)
+file2:    $(ODIR)/file2.o
 <tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-file3: $(_OBJ3)
+file3:    $(ODIR)/file3.o
 <tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-q2_compound: $(_OBJ4)
+q2_compound: $(ODIR)/q2_compound.o
 <tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-q3_stats: $(_OBJ6)
+q3_stats: $(ODIR)/q3_stats.o
 <tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-q4_replace: $(_OBJ5)
+q4_replace: $(ODIR)/q4_replace.o
 <tab>$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 
 clean:
-<tab>rm -f *~ core $(IDIR)/*~ 
-<tab>rm -f q1_debug file1 file2 file3 q2_compound q3_stats q4_replace
-<tab>rm -f *.o
-
-etags:
-<tab>find . -type f -iname "*.[ch]" | xargs etags --append
+<tab>rm -f $(ODIR)/*.o q1_debug file1 file2 file3 q2_compound q3_stats q4_replace
