@@ -1,5 +1,10 @@
 /*
 Author: Ali Younes , Ali Tleis
+Emails:
+Tleis.a@northeastern.edu
+Younes.al@northeastern.edu
+
+Worked on my repo but did the code together. I tried adding him as a collobarator but wouldn't quite let me. Regardless code was worked in a pair programming format similar to how fundies 2 was structured!
 
 
 Pseudocode:
