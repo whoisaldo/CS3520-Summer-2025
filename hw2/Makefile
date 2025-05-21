@@ -13,11 +13,11 @@ all: $(TARGET)
 
 # Link/compile
 $(TARGET): $(SRCS)
-<TAB>$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRCS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRCS)
 
 # Remove built files
 clean:
-<TAB>rm -f $(TARGET) *.o
+	rm -f $(TARGET) *.o
 
 .PHONY: all clean
 
