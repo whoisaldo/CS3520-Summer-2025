@@ -1,0 +1,95 @@
+Ali Younes    – younes.al@northeastern.edu  
+Ali Tleis     – tleis.a@northeastern.edu  
+Part 2a – Airline Reservations System Pseudocode (Rubric-aligned)
+
+1. Welcome & User Type Selection (1 pt)
+   └─ Prompt “Passenger (P) or Employee (E)?”  
+       • If invalid → redisplay prompt.
+
+2. Passenger Login & Options (1 pt)
+   └─ No credentials needed. On “P” show menu of 6 choices:
+       1) Display seating chart
+       2) Manual seat choice
+       3) Automatic seat choice
+       4) Change or cancel seat
+       5) Print boarding pass
+       6) Quit
+
+3. Employee Login & Options (3 pts)
+   ├─ Prompt username/password; validate against defaults.
+   └─ On “E” show menu of 6 choices:
+       1) Display seating chart
+       2) Print manifest
+       3) Load previous data
+       4) Save current data
+       5) Reassign or cancel any seat
+       6) Quit
+
+4. Display Seating Chart (5 pts)
+   └─ Show rows 1–12 × cols A,B,D,E,F,H with “[ ]” or “[X]”  
+
+5. Passenger: Manual Choosing (10 pts)
+   ├─ Show chart
+   ├─ Prompt for class (F/B/Economy) → limit row range
+   ├─ Show available seats in range
+   ├─ Prompt seat (e.g. “B4”)
+   ├─ If invalid or taken → error & retry
+   └─ Otherwise mark taken & record name
+
+6. Passenger: Automatic Choosing (4 pts)
+   ├─ Prompt for class → set row range
+   ├─ Randomly pick until EMPTY found or none left
+   ├─ If found → assign & inform
+   └─ Else → “Next flight leaves in 3 hours.”
+
+7. Passenger: Change or Cancel (10 pts)
+   ├─ Prompt “Change (C) or Cancel (X)?”
+   ├─ Prompt for seatID & name → verify match
+   ├─ If Cancel:
+   │    └─ seats[row][col]=EMPTY; names[row][col]=“”
+   ├─ If Change:
+   │    ├─ free old seat
+   │    └─ go to Automatic Choosing
+   └─ If no match → error & return to submenu
+
+8. Passenger: Print Boarding Pass (7 pts)
+   ├─ Prompt for name or seatID
+   ├─ Resolve to row,col; if EMPTY → error
+   └─ Print “NAME, SEAT <ID>, Class <…>”
+
+9. Passenger: Quit (1 pt)
+   └─ Return to welcome screen (or exit)
+
+10. Employee: Print Manifest (5 pts)
+    ├─ Prompt sort order: seat-order / alphabetical / by class
+    ├─ Build list of (name, seatID, class)
+    └─ Sort & display table
+
+11. Employee: Load Previous Data (6 pts)
+    └─ Read “seats.txt” into seats[][] and names[][]
+
+12. Employee: Save Current Data (9 pts)
+    └─ Write seats[][] and names[][] to “seats.txt”
+
+13. Employee: Reassign or Cancel Any Seat (10 pts)
+    ├─ Prompt seatID & action (reassign/cancel)
+    ├─ If reassign → free, then call Automatic Choosing on that name
+    └─ If cancel → free and remove name
+
+14. Employee: Quit (1 pt)
+    └─ Exit program
+
+15. Error Handling (5 pts)
+    ├─ Invalid menu choices → “Invalid input” & redisplay
+    ├─ Manual seat out-of-range or taken → “Seat unavailable” & retry
+    └─ Boarding-pass or manifest requests on empty seat → “No data”
+
+16. Code Organization & Readability (2 pts)
+    └─ Each bullet above → its own function  
+
+17. Design & Use of Vectors/2D Array (5 pts)
+    └─ Use a 12×6 array or vector<vector<…>> for seats/names  
+
+18. Pseudocode Quality (8 pts)
+    └─ Clearly numbered steps, matches spec exactly
+
