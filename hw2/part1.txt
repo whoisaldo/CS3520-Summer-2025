@@ -1,0 +1,24 @@
+Question 1 – Number Conversions
+
+a) Convert 3A2_16 to binary, octal, and decimal:
+- Binary: 0011 1010 0010
+- Octal: 1 6 4 2
+- Decimal: 930
+
+b) Sum & product of 1C01_16 and 9010_10 (results in hex):
+
+1. Convert 9010_10 to hex:
+   9010 ÷ 16 = 563 r2 → 2  
+   563  ÷ 16 = 35  r3 → 3  
+   35   ÷ 16 = 2   r3 → 3  
+   2    ÷ 16 = 0   r2 → 2  
+   ⇒ 9010_10 = 2332_16
+
+2. Sum: 1C01_16 + 2332_16 = 3F33_16
+
+3. Product:
+   - 1C01_16 = 7169_10  
+   - 7169 × 9010 = 64,592,690_10  
+   - 64,592,690_10 → hex = 3D99B32_16  
+   ⇒ Product = 3D99B32_16
+
