@@ -1,5 +1,4 @@
 Ali Younes    – younes.al@northeastern.edu  
-Ali Tleis     – tleis.a@northeastern.edu  
 Part 2a – Airline Reservations System Pseudocode (Rubric-aligned)
 
 1. Welcome & User Type Selection (1 pt)
