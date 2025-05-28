@@ -1,97 +1,42 @@
-/* slider.cpp --- 
- * 
- * Filename: slider.cpp
- * Description: 
- * Author: Adeel Bhutta 
- * Maintainer: 
- * Created: Wed May 15 2024
- * Last-Updated: 
- *           By: 
- *     Update #: 0
- * Keywords: 
- * Compatibility: 
- * 
+/* File:        slider.cpp
+ * Author:      Ali Younes    <younes.al@northeastern.edu>
+ * Co-Author:   Ali Tleis     <tleis.a@northeastern.edu>
+ * Description: Slider implementation for variable paddle length
  */
 
-/* Copyright (c) 2016 Adeel Bhutta
- * 
- * All rights reserved. 
- * 
- * Additional copyrights may follow 
- */
 #include "slider.hpp"
 #include <ncurses.h>
-#include <cstdio>
-#include <ctime>
 #include <cstdlib>
 #include <cstring>
 
-// This intializes the properties of the slider
-const slider_t slider_types[2] = {
-    {
-        "top",
-        {{1,1,1,1}}, 
-        0,
-        0,
-        '%',
-        {0,0,0}
-    },
-    {
-        "bottom",
-        {{1,1,1,1}}, 
-        0,
-        0,
-        '+',
-        {0,0,0}
-    },
-};
+slider_t *init_slider(int initial_x, int initial_y, char type, int length) {
+    slider_t *s = (slider_t *)malloc(sizeof(slider_t));
+    if (type == 'T') {
+        strncpy(s->type_str, "top",    sizeof(s->type_str));
+        s->draw_char = '%';
+    } else {
+        strncpy(s->type_str, "bottom", sizeof(s->type_str));
+        s->draw_char = '+';
+    }
+    s->upper_left_x = initial_x;
+    s->upper_left_y = initial_y;
+    s->length       = length;
+    memset(s->color, 0, sizeof(s->color));
+    return s;
+}
 
-// Changes the location of the slider
+void draw_slider(slider_t *s) {
+    for (int x = 0; x < s->length; x++)
+        mvprintw(s->upper_left_y, s->upper_left_x + x, "%c", s->draw_char);
+}
+
+void undraw_slider(slider_t *s) {
+    for (int x = 0; x < s->length; x++)
+        mvprintw(s->upper_left_y, s->upper_left_x + x, " ");
+}
+
 void moveSlider(slider_t *s, int x, int y) {
-    
     s->upper_left_x = x;
     s->upper_left_y = y;
 }
 
-// Intializes the slider
-slider_t *init_slider (int initial_x, int initial_y, char type) {
-  slider_t *s = (slider *) malloc(sizeof(slider_t));
-  if (type == 'T'){
-      memcpy(s, &slider_types[0], sizeof(slider_t));
-  }
-  else
-  {
-      memcpy(s, &slider_types[1], sizeof(slider_t));
-  }
-  
-  
-  s->upper_left_x = initial_x;
-  s->upper_left_y = initial_y;
-  return(s);
-}
-
-// Renders the slider on the screen
-void draw_slider(slider_t *s){
-  int x,y;
-  for (x=0;x<4;x++) {
-    for (y=0;y<1;y++) {
-      if (s->piece[y][x]) {
-        mvprintw(s->upper_left_y+y,s->upper_left_x+x,"%c",s->draw_char);
-      }
-    }
-  }
-
-}
-
-// Replaces the slider with blank spaces
-void undraw_slider(slider_t *s){
-  int x,y;
-  for (x=0;x<4;x++) {
-    for (y=0;y<1;y++) {
-      if (s->piece[y][x]) {
-        mvprintw(s->upper_left_y+y,s->upper_left_x+x," ",s->draw_char);
-      }
-    }
-  }
-
-}

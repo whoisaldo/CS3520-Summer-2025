@@ -1,30 +1,16 @@
-/* main.cpp --- 
- * 
- * Filename: main.cpp
- * Description: 
- * Author: Adeel Bhutta 
- * Maintainer: 
- * Created: Wed May 15 2024
- * Last-Updated: 
- *           By: 
- *     Update #: 0
- * Keywords: 
- * Compatibility: 
- * 
+/* File:        main.cpp
+ * Author:      Ali Younes    <younes.al@northeastern.edu>
+ * Co-Author:   Ali Tleis     <tleis.a@northeastern.edu>
+ * Description: Main entry point for the Air Hockey project
  */
 
-/* Copyright (c) 2016 Adeel Bhutta
- * 
- * All rights reserved. 
- * 
- * Additional copyrights may follow 
- */
-#include <stdio.h>
+#include <cstdio>
 #include <ctime>
 #include <ncurses.h>
 #include "air_hockey.hpp"
 
-int main(){
+int main() {
     air_hockey();
     return 0;
 }
+
