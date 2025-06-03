@@ -1,1 +1,219 @@
-test
+// Younes.al@northeastern.edu
+// Ali Younes 6/3/2025
+// CS3520 course
+//
+// Assignment 4 – Part 1: Team Builder Pseudocode
+//
+// Read a CSV of students (username, three skill ratings, two preference lists).
+// Form teams of up to four students in one of two modes:
+//   1) Honor "want to work with" lists first.
+//   2) Balance overall skill levels across teams.
+// Then compute and print each team's total skill scores and write a CSV output.
+//
+//----------------------------------------------
+// Data Definitions:
+//
+// Student:
+//   username      : string
+//   progSkill     : integer   // 1 = beginner, 2 = intermediate, 3 = advanced
+//   debugSkill    : integer   // same scale
+//   designSkill   : integer   // same scale
+//   wantList      : list of string     // usernames separated by ':' in CSV
+//   dontWantList  : list of string     // usernames separated by ':' in CSV
+//
+// allStudents     : list of Student
+// lookupByName    : map string -> reference to Student
+// teams           : list of list of references to Student
+// assigned        : list of boolean     // same length as allStudents
+//
+//----------------------------------------------
+// Main:
+//
+// 1. Prompt for CSV filename
+// 2. Call ReadRosterFromCSV(filename, allStudents, lookupByName)
+// 3. Prompt for mode (1 or 2)
+// 4. If mode = 1, call BuildTeamsByPreference(allStudents, lookupByName, teams)
+//    Else call BuildTeamsBySkillBalance(allStudents, teams)
+// 5. Call ComputeAndPrintTeamScores(teams)
+// 6. Call WriteTeamsToCSV(teams, "teams_output.csv")
+//
+//----------------------------------------------
+// Procedure ReadRosterFromCSV(filename, allStudents, lookupByName):
+//
+// 1. Open file filename for reading
+// 2. Read and discard header line (if present)
+// 3. While not end of file:
+//    a. Read line
+//    b. Split line by commas into:
+//         username, progStr, debugStr, designStr, dontWantStr, wantStr
+//    c. Create Student s
+//       s.username      < username
+//       s.progSkill     < integer value of progStr
+//       s.debugSkill    < integer value of debugStr
+//       s.designSkill   < integer value of designStr
+//    d. Split dontWantStr by ':' into s.dontWantList (ignore empty tokens)
+//    e. Split wantStr by ':' into s.wantList (ignore empty tokens)
+//    f. Append s to allStudents
+//    g. Set lookupByName[s.username] < reference to allStudents.back()
+// 4. Close file
+//
+//----------------------------------------------
+// Procedure BuildTeamsByPreference(allStudents, lookupByName, teams):
+//
+// 1. N < length of allStudents
+// 2. Initialize assigned as list of N false
+// 3. Initialize teams as empty list
+// 4. First pass (honor want lists):
+//    For i from 0 to N-1:
+//      If assigned[i] = true, continue
+//      me < reference to allStudents[i]
+//      For each wantedName in me.wantList:
+//        If lookupByName does not contain wantedName, continue
+//        other < lookupByName[wantedName]
+//        j < index of other in allStudents
+//        If j < 0 or assigned[j] = true, continue
+//        conflict < false
+//        For each name in me.dontWantList:
+//          If name = other.username then conflict < true; break
+//        If conflict, continue
+//        For each name in other.dontWantList:
+//          If name = me.username then conflict < true; break
+//        If conflict, continue
+//        team < empty list
+//        Add me to team; Add other to team
+//        assigned[i] < true; assigned[j] < true
+//        // Fill up to 4 members
+//        For k from 0 to N-1 while team size < 4:
+//          If assigned[k] = true, continue
+//          candidate < reference to allStudents[k]
+//          canJoin < true
+//          For each member in team:
+//            For each badName in member.dontWantList:
+//              If badName = candidate.username then canJoin < false; break
+//            If not canJoin, break
+//            For each badName in candidate.dontWantList:
+//              If badName = member.username then canJoin < false; break
+//            If not canJoin, break
+//          If canJoin:
+//            Add candidate to team; assigned[k] < true
+//        End For
+//        Add team to teams
+//        Break out of wantList loop
+//      End For
+//    End For
+// 5. Second pass (assign leftovers):
+//    For i from 0 to N-1:
+//      If assigned[i] = true, continue
+//      me < reference to allStudents[i]
+//      placed < false
+//      For each team in teams:
+//        If team size ≥ 4, continue
+//        conflict < false
+//        For each member in team:
+//          For each badName in member.dontWantList:
+//            If badName = me.username then conflict < true; break
+//          If conflict, break
+//          For each badName in me.dontWantList:
+//            If badName = member.username then conflict < true; break
+//          If conflict, break
+//        If not conflict:
+//          Add me to team; assigned[i] < true; placed < true; break
+//      End For
+//      If not placed:
+//        newTeam < empty list
+//        Add me to newTeam; assigned[i] < true
+//        Add newTeam to teams
+//    End For
+//
+//----------------------------------------------
+// Procedure BuildTeamsBySkillBalance(allStudents, teams):
+//
+// 1. N < length of allStudents
+// 2. Sort allStudents by descending (progSkill, then designSkill, then debugSkill)
+// 3. numTeams < ceiling of N / 4.0
+// 4. Initialize teams as list of numTeams empty lists
+// 5. Initialize assigned as list of N false
+// 6. Pass 1 (round robin):
+//    teamIdx < 0
+//    For i from 0 to N-1:
+//      If assigned[i] = true, continue
+//      If teams[teamIdx].size ≥ 4:
+//        teamIdx < (teamIdx + 1) mod numTeams
+//        Decrement i; continue
+//      conflict < false
+//      For each member in teams[teamIdx]:
+//        For each badName in member.dontWantList:
+//          If badName = allStudents[i].username then conflict < true; break
+//        If conflict, break
+//        For each badName in allStudents[i].dontWantList:
+//          If badName = member.username then conflict < true; break
+//        If conflict, break
+//      If not conflict:
+//        Add reference to allStudents[i] to teams[teamIdx]
+//        assigned[i] < true
+//        teamIdx < (teamIdx + 1) mod numTeams
+//    End For
+// 7. Pass 2 (leftovers):
+//    For i from 0 to N-1:
+//      If assigned[i] = true, continue
+//      candidate < reference to allStudents[i]
+//      bestTeam < -1
+//      lowestSum < large number
+//      For t from 0 to numTeams-1:
+//        If teams[t].size ≥ 4, continue
+//        conflict < false
+//        For each member in teams[t]:
+//          For each badName in member.dontWantList:
+//            If badName = candidate.username then conflict < true; break
+//          If conflict, break
+//          For each badName in candidate.dontWantList:
+//            If badName = member.username then conflict < true; break
+//          If conflict, break
+//        If conflict, continue
+//        sum < 0
+//        For each member in teams[t]:
+//          sum < sum + member.progSkill + member.designSkill + member.debugSkill
+//        If sum < lowestSum:
+//          lowestSum < sum; bestTeam < t
+//      If bestTeam ≥ 0:
+//        Add candidate to teams[bestTeam]; assigned[i] < true
+//      Else:
+//        For t from 0 to numTeams-1:
+//          If teams[t].size = 3:
+//            Add candidate to teams[t]; assigned[i] < true; break
+//        If not assigned[i]:
+//          newTeam < empty list
+//          Add candidate to newTeam; assigned[i] < true
+//          Add newTeam to teams
+//
+//----------------------------------------------
+// Procedure ComputeAndPrintTeamScores(teams):
+//
+// 1. For t from 0 to length(teams)-1:
+//    sumProg < 0; sumDebug < 0; sumDesign < 0
+//    For each studentPtr in teams[t]:
+//      sumProg < sumProg + studentPtr.progSkill
+//      sumDebug < sumDebug + studentPtr.debugSkill
+//      sumDesign < sumDesign + studentPtr.designSkill
+//    Print "Team ", (t+1), " Scores: { Programming = ", sumProg,
+//          ", Debugging = ", sumDebug, ", Design = ", sumDesign, " }"
+//
+//----------------------------------------------
+// Procedure WriteTeamsToCSV(teams, outputFilename):
+//
+// 1. Open file outputFilename for writing
+// 2. Print header: "GroupNumber,Member1,Member2,Member3,Member4"
+// 3. For t from 0 to length(teams)-1:
+//      Print (t+1)
+//      For j from 0 to 3:
+//        If j < length(teams[t]):
+//          Print ",", teams[t][j].username
+//        Else:
+//          Print ","
+//      End For
+//      Print newline
+// 4. Close file
+//
+//----------------------------------------------
+// End of pseudocode for Part 1.
+
