@@ -5,6 +5,8 @@
 // CS3520 course
 
 #include "TeamBuilder.hpp"
+#include <climits> 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
