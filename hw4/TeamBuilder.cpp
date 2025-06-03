@@ -5,30 +5,42 @@
 // CS3520 course
 
 #include "TeamBuilder.hpp"
-#include <climits> 
-#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include <algorithm>
+#include <climits>
+#include <string>
+#include <cctype>
 
-// Read CSV and fill allStudents + lookupByName
-void readRosterFromCSV(const std::string &filename,
-                       std::vector<Student> &allStudents,
-                       std::unordered_map<std::string, Student*> &lookupByName) {
-    std::ifstream fin(filename);
-    if (!fin) {
-        std::cerr << "Error: cannot open file " << filename << "\n";
-        return;
+// convert text levels to integers
+static int textToSkill(const std::string& t) {
+    std::string lower;
+    for (char c : t) lower.push_back(std::tolower(c));
+    if (lower == "beginner")     return 1;
+    if (lower == "intermediate") return 2;
+    if (lower == "advanced")     return 3;
+    try {
+        return std::stoi(t);
+    } catch (...) {
+        return 1;
     }
+}
+
+void readRosterFromCSV(const std::string& filename,
+                       std::vector<Student>& allStudents,
+                       std::unordered_map<std::string, Student*>& lookupByName) {
+    std::ifstream fin(filename);
+    if (!fin) return;
 
     std::string line;
-    // skip header line (assume it exists)
     std::getline(fin, line);
 
     while (std::getline(fin, line)) {
         std::stringstream ss(line);
-        std::string username, progStr, debugStr, designStr, dontWantStr, wantStr;
+        std::string username, progStr, debugStr, designStr;
+        std::string dontWantStr, wantStr;
 
         std::getline(ss, username, ',');
         std::getline(ss, progStr, ',');
@@ -39,28 +51,22 @@ void readRosterFromCSV(const std::string &filename,
 
         Student s;
         s.username    = username;
-        s.progSkill   = std::stoi(progStr);
-        s.debugSkill  = std::stoi(debugStr);
-        s.designSkill = std::stoi(designStr);
+        s.progSkill   = textToSkill(progStr);
+        s.debugSkill  = textToSkill(debugStr);
+        s.designSkill = textToSkill(designStr);
 
-        // split dontWantStr by ':'
         {
             std::stringstream ss2(dontWantStr);
             std::string token;
             while (std::getline(ss2, token, ':')) {
-                if (!token.empty()) {
-                    s.dontWantList.push_back(token);
-                }
+                if (!token.empty()) s.dontWantList.push_back(token);
             }
         }
-        // split wantStr by ':'
         {
             std::stringstream ss3(wantStr);
             std::string token;
             while (std::getline(ss3, token, ':')) {
-                if (!token.empty()) {
-                    s.wantList.push_back(token);
-                }
+                if (!token.empty()) s.wantList.push_back(token);
             }
         }
 
@@ -71,74 +77,60 @@ void readRosterFromCSV(const std::string &filename,
     fin.close();
 }
 
-// Helper to find index of a Student* in allStudents
-static int indexOfStudent(const std::vector<Student> &allStudents, const Student *ptr) {
+static int indexOfStudent(const std::vector<Student>& allStudents, const Student* ptr) {
     for (int i = 0; i < (int)allStudents.size(); ++i) {
-        if (&allStudents[i] == ptr) {
-            return i;
-        }
+        if (&allStudents[i] == ptr) return i;
     }
     return -1;
 }
 
-// Build teams honoring “want” lists first
-void buildTeamsByPreference(const std::vector<Student> &allStudents,
-                            const std::unordered_map<std::string, Student*> &lookupByName,
-                            std::vector<std::vector<Student*>> &teams) {
+void buildTeamsByPreference(const std::vector<Student>& allStudents,
+                            const std::unordered_map<std::string, Student*>& lookupByName,
+                            std::vector<std::vector<Student*>>& teams) {
     int N = allStudents.size();
     std::vector<bool> assigned(N, false);
     teams.clear();
 
-    // first pass: pair up based on wantList
     for (int i = 0; i < N; ++i) {
         if (assigned[i]) continue;
-        Student *me = const_cast<Student*>(&allStudents[i]);
+        Student* me = const_cast<Student*>(&allStudents[i]);
 
-        for (const auto &wantedName : me->wantList) {
+        for (const auto& wantedName : me->wantList) {
             auto it = lookupByName.find(wantedName);
             if (it == lookupByName.end()) continue;
-            Student *other = it->second;
+            Student* other = it->second;
 
             int j = indexOfStudent(allStudents, other);
             if (j < 0 || assigned[j]) continue;
 
-            // check dontWant conflict both ways
             bool conflict = false;
-            for (auto &x : me->dontWantList) {
+            for (auto& x : me->dontWantList) {
                 if (x == other->username) { conflict = true; break; }
             }
             if (conflict) continue;
-            for (auto &x : other->dontWantList) {
+            for (auto& x : other->dontWantList) {
                 if (x == me->username) { conflict = true; break; }
             }
             if (conflict) continue;
 
-            // can pair me and other
             std::vector<Student*> team;
             team.push_back(me);
             team.push_back(other);
             assigned[i] = true;
             assigned[j] = true;
 
-            // fill up to 4
             for (int k = 0; k < N && (int)team.size() < 4; ++k) {
                 if (assigned[k]) continue;
-                Student *candidate = const_cast<Student*>(&allStudents[k]);
+                Student* candidate = const_cast<Student*>(&allStudents[k]);
 
                 bool canJoin = true;
-                for (auto *member : team) {
-                    for (auto &bad : member->dontWantList) {
-                        if (bad == candidate->username) {
-                            canJoin = false;
-                            break;
-                        }
+                for (auto* member : team) {
+                    for (auto& bad : member->dontWantList) {
+                        if (bad == candidate->username) { canJoin = false; break; }
                     }
                     if (!canJoin) break;
-                    for (auto &bad : candidate->dontWantList) {
-                        if (bad == member->username) {
-                            canJoin = false;
-                            break;
-                        }
+                    for (auto& bad : candidate->dontWantList) {
+                        if (bad == member->username) { canJoin = false; break; }
                     }
                     if (!canJoin) break;
                 }
@@ -149,26 +141,25 @@ void buildTeamsByPreference(const std::vector<Student> &allStudents,
             }
 
             teams.push_back(team);
-            break; // stop looking at wantList for me
+            break;
         }
     }
 
-    // second pass: assign leftovers
     for (int i = 0; i < N; ++i) {
         if (assigned[i]) continue;
-        Student *me = const_cast<Student*>(&allStudents[i]);
+        Student* me = const_cast<Student*>(&allStudents[i]);
         bool placed = false;
 
-        for (auto &team : teams) {
+        for (auto& team : teams) {
             if ((int)team.size() >= 4) continue;
 
             bool conflict = false;
-            for (auto *member : team) {
-                for (auto &bad : member->dontWantList) {
+            for (auto* member : team) {
+                for (auto& bad : member->dontWantList) {
                     if (bad == me->username) { conflict = true; break; }
                 }
                 if (conflict) break;
-                for (auto &bad : me->dontWantList) {
+                for (auto& bad : me->dontWantList) {
                     if (bad == member->username) { conflict = true; break; }
                 }
                 if (conflict) break;
@@ -190,18 +181,14 @@ void buildTeamsByPreference(const std::vector<Student> &allStudents,
     }
 }
 
-// Compare helper for sorting by skill
-static bool compareBySkills(const Student &a, const Student &b) {
-    if (a.progSkill != b.progSkill)
-        return a.progSkill > b.progSkill;
-    if (a.designSkill != b.designSkill)
-        return a.designSkill > b.designSkill;
+static bool compareBySkills(const Student& a, const Student& b) {
+    if (a.progSkill != b.progSkill) return a.progSkill > b.progSkill;
+    if (a.designSkill != b.designSkill) return a.designSkill > b.designSkill;
     return a.debugSkill > b.debugSkill;
 }
 
-// Build teams by balancing skills
-void buildTeamsBySkillBalance(std::vector<Student> &allStudents,
-                              std::vector<std::vector<Student*>> &teams) {
+void buildTeamsBySkillBalance(std::vector<Student>& allStudents,
+                              std::vector<std::vector<Student*>>& teams) {
     int N = allStudents.size();
     std::sort(allStudents.begin(), allStudents.end(), compareBySkills);
 
@@ -212,7 +199,6 @@ void buildTeamsBySkillBalance(std::vector<Student> &allStudents,
     std::vector<bool> assigned(N, false);
     int teamIdx = 0;
 
-    // pass 1: round robin
     for (int i = 0; i < N; ++i) {
         if (assigned[i]) continue;
         if ((int)teams[teamIdx].size() >= 4) {
@@ -222,19 +208,13 @@ void buildTeamsBySkillBalance(std::vector<Student> &allStudents,
         }
 
         bool conflict = false;
-        for (auto *member : teams[teamIdx]) {
-            for (auto &bad : member->dontWantList) {
-                if (bad == allStudents[i].username) {
-                    conflict = true;
-                    break;
-                }
+        for (auto* member : teams[teamIdx]) {
+            for (auto& bad : member->dontWantList) {
+                if (bad == allStudents[i].username) { conflict = true; break; }
             }
             if (conflict) break;
-            for (auto &bad : allStudents[i].dontWantList) {
-                if (bad == member->username) {
-                    conflict = true;
-                    break;
-                }
+            for (auto& bad : allStudents[i].dontWantList) {
+                if (bad == member->username) { conflict = true; break; }
             }
             if (conflict) break;
         }
@@ -245,10 +225,9 @@ void buildTeamsBySkillBalance(std::vector<Student> &allStudents,
         }
     }
 
-    // pass 2: leftovers
     for (int i = 0; i < N; ++i) {
         if (assigned[i]) continue;
-        Student *candidate = &allStudents[i];
+        Student* candidate = &allStudents[i];
 
         int bestTeam = -1;
         int lowestSum = INT_MAX;
@@ -256,26 +235,20 @@ void buildTeamsBySkillBalance(std::vector<Student> &allStudents,
             if ((int)teams[t].size() >= 4) continue;
 
             bool conflict = false;
-            for (auto *member : teams[t]) {
-                for (auto &bad : member->dontWantList) {
-                    if (bad == candidate->username) {
-                        conflict = true;
-                        break;
-                    }
+            for (auto* member : teams[t]) {
+                for (auto& bad : member->dontWantList) {
+                    if (bad == candidate->username) { conflict = true; break; }
                 }
                 if (conflict) break;
-                for (auto &bad : candidate->dontWantList) {
-                    if (bad == member->username) {
-                        conflict = true;
-                        break;
-                    }
+                for (auto& bad : candidate->dontWantList) {
+                    if (bad == member->username) { conflict = true; break; }
                 }
                 if (conflict) break;
             }
             if (conflict) continue;
 
             int sum = 0;
-            for (auto *member : teams[t]) {
+            for (auto* member : teams[t]) {
                 sum += member->progSkill + member->designSkill + member->debugSkill;
             }
             if (sum < lowestSum) {
@@ -288,7 +261,6 @@ void buildTeamsBySkillBalance(std::vector<Student> &allStudents,
             teams[bestTeam].push_back(candidate);
             assigned[i] = true;
         } else {
-            // put in any team with exactly 3 members
             bool placed = false;
             for (int t = 0; t < numTeams; ++t) {
                 if ((int)teams[t].size() == 3) {
@@ -308,11 +280,10 @@ void buildTeamsBySkillBalance(std::vector<Student> &allStudents,
     }
 }
 
-// Print each team’s summed skills
-void computeAndPrintTeamScores(const std::vector<std::vector<Student*>> &teams) {
+void computeAndPrintTeamScores(const std::vector<std::vector<Student*>>& teams) {
     for (int t = 0; t < (int)teams.size(); ++t) {
         int sumProg = 0, sumDebug = 0, sumDesign = 0;
-        for (auto *s : teams[t]) {
+        for (auto* s : teams[t]) {
             sumProg   += s->progSkill;
             sumDebug  += s->debugSkill;
             sumDesign += s->designSkill;
@@ -324,14 +295,10 @@ void computeAndPrintTeamScores(const std::vector<std::vector<Student*>> &teams) 
     }
 }
 
-// Write teams to CSV
-void writeTeamsToCSV(const std::vector<std::vector<Student*>> &teams,
-                     const std::string &outputFilename) {
+void writeTeamsToCSV(const std::vector<std::vector<Student*>>& teams,
+                     const std::string& outputFilename) {
     std::ofstream fout(outputFilename);
-    if (!fout) {
-        std::cerr << "Error: cannot open " << outputFilename << " for writing\n";
-        return;
-    }
+    if (!fout) return;
 
     fout << "GroupNumber,Member1,Member2,Member3,Member4\n";
     for (int t = 0; t < (int)teams.size(); ++t) {
