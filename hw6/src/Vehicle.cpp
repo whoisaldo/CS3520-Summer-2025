@@ -1,3 +1,9 @@
+/* 
+ * Author:  Ali Younes & Ali Tleis 
+ * Course:  CS3520
+ * Date:    6/17/2025
+ * Assignment 6: Automatic Parking Lot + Object Pool
+ */
 #include "Vehicle.hpp"
 using namespace std;
 Vehicle::Vehicle(const string& licensePlate, VehicleType type)
