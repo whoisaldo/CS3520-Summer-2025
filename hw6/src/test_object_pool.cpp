@@ -1,3 +1,9 @@
+/* 
+ * Author:  Ali Younes & Ali Tleis 
+ * Course:  CS3520
+ * Date:    6/17/2025
+ * Assignment 6: Automatic Parking Lot + Object Pool
+ */
 #include "ObjectPool.hpp"
 #include "Vehicle.hpp"
 #include "Customer.hpp"
