@@ -1,3 +1,9 @@
+/* 
+ * Author:  Ali Younes & Ali Tleis 
+ * Course:  CS3520
+ * Date:    6/17/2025
+ * Assignment 6: Automatic Parking Lot + Object Pool
+ */
 #include "Customer.hpp"
 using namespace std;
 Customer::Customer(const string& id, const string& name, 
