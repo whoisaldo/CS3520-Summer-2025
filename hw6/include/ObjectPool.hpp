@@ -5,22 +5,24 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+#include <cstddef>      // for std::size_t
 using namespace std;
+
 template<typename T>
 class ObjectPool {
 private:
     queue<T*> availableObjects;
     vector<unique_ptr<T>> allObjects;
-    int maxSize;
+    std::size_t maxSize;
     mutable mutex poolMutex;
 
 public:
-    explicit ObjectPool(int initialSize = 10);
+    explicit ObjectPool(std::size_t initialSize = 10);
     ~ObjectPool();
     
     T* get_object();
     void return_object(T* obj);
-    int size() const;
+    std::size_t size() const;
     void alloc_more();
     
     // Delete copy constructor and assignment operator for thread safety
@@ -28,20 +30,24 @@ public:
     ObjectPool& operator=(const ObjectPool&) = delete;
 };
 
+// Constructor: allocate initial objects (initialSize) and set max capacity (double initial)
 template<typename T>
-ObjectPool<T>::ObjectPool(int initialSize) : maxSize(initialSize * 2) {
-    for (int i = 0; i < initialSize; ++i) {
+ObjectPool<T>::ObjectPool(std::size_t initialSize)
+    : maxSize(initialSize * 2) {
+    for (std::size_t i = 0; i < initialSize; ++i) {
         auto obj = make_unique<T>();
         availableObjects.push(obj.get());
         allObjects.push_back(move(obj));
     }
 }
 
+// Destructor: unique_ptrs automatically free all objects
 template<typename T>
 ObjectPool<T>::~ObjectPool() {
-    // Unique pointers will automatically clean up
+    // No additional cleanup required (RAII)
 }
 
+// Acquire an object from the pool; may grow or create a temporary if at capacity
 template<typename T>
 T* ObjectPool<T>::get_object() {
     lock_guard<mutex> lock(poolMutex);
@@ -60,6 +66,7 @@ T* ObjectPool<T>::get_object() {
     return obj;
 }
 
+// Return an object to the pool or delete if it was temporary
 template<typename T>
 void ObjectPool<T>::return_object(T* obj) {
     if (!obj) return;
@@ -76,8 +83,6 @@ void ObjectPool<T>::return_object(T* obj) {
     }
     
     if (belongsToPool) {
-        // Reset object state if needed (T should have a reset method)
-        // obj->reset(); // Uncomment if T has reset method
         availableObjects.push(obj);
     } else {
         // This was a temporary object, delete it
@@ -85,17 +90,19 @@ void ObjectPool<T>::return_object(T* obj) {
     }
 }
 
+// Return number of free objects
 template<typename T>
-int ObjectPool<T>::size() const {
+std::size_t ObjectPool<T>::size() const {
     lock_guard<mutex> lock(poolMutex);
     return availableObjects.size();
 }
 
+// Allocate additional objects up to maxSize
 template<typename T>
 void ObjectPool<T>::alloc_more() {
     // This method should be called while holding the mutex
-    int currentSize = allObjects.size();
-    int newObjects = min(5, maxSize - currentSize);
+    int currentSize = static_cast<int>(allObjects.size());
+    int newObjects = std::min<int>(5, static_cast<int>(maxSize) - currentSize);
     
     for (int i = 0; i < newObjects; ++i) {
         auto obj = make_unique<T>();
