@@ -1,50 +1,41 @@
 # Makefile for Convention Center Management System
 
-# Compiler and flags
-CXX := g++
+CXX      := g++
 CXXFLAGS := -std=c++17 -Iinclude -Wall -Wextra -g
+LDLIBS   := -lstdc++fs
 
-# Directories
-SRCDIR := src
-INCDIR := include
+SRCDIR   := src
 BUILDDIR := build
-BINDIR := bin
+BINDIR   := bin
+TARGET   := management_system
 
-# Executable name
-TARGET := management_system
+SOURCES  := $(wildcard $(SRCDIR)/*.cpp)
+OBJECTS  := $(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SOURCES))
+DEPENDS  := $(OBJECTS:.o=.d)
 
-# Source and object files
-tmp_SOURCES := $(wildcard $(SRCDIR)/*.cpp)
-SOURCES := $(tmp_SOURCES)
-OBJECTS := $(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SOURCES))
-DEPENDS := $(OBJECTS:.o=.d)
-
-# Phony targets
 .PHONY: all clean help
 
-# Default build target
-default: all
-
+# Default target: build the executable
 all: $(BINDIR)/$(TARGET)
 
-# Link step
+# Link rule: create bin/management_system from object files
 $(BINDIR)/$(TARGET): $(OBJECTS)
 	@mkdir -p $(BINDIR)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $@ $(LDLIBS)
 
-# Compile step with dependency generation
+# Compile rule: build each .o from its .cpp and generate dependencies
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(BUILDDIR)
 	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
-# Include header dependencies
+# Include dependency files if they exist
 -include $(DEPENDS)
 
-# Clean up build artifacts
+# Remove build artifacts
 clean:
 	rm -rf $(BUILDDIR) $(BINDIR)
 
-# Help message
+# Show help message
 help:
 	@echo "Usage:"
 	@echo "  make        Build the project"
