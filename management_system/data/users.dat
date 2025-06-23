@@ -1,0 +1,10 @@
+Manager|1|manager|Admin|admin@convention.com
+Resident|2|resident1|John Doe|john@example.com|R12345
+NonResident|3|nonresident1|Jane Smith|jane@example.com
+Organization|4|organization1|Acme Corp|info@acme.com|ORG001|Acme Corporation
+City|5|city1|Public Works|works@citygovt.com|Infrastructure Department
+Resident|6|resident2|Mark Wilson|mark@example.com|R54321
+Organization|7|organization2|Tech Summit|info@techsummit.com|ORG002|Tech Summit Inc.
+NonResident|8|nonresident2|Sarah Johnson|sarah@example.com
+Resident|9|resident3|Emily Davis|emily@example.com|R78901
+NonResident|10|nonresident3|Mike Brown|mike@example.com
