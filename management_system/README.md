@@ -3,6 +3,8 @@
 ## Overview
 This system manages event reservations, ticket sales, and facility scheduling for a convention center. It provides functionality for different user types (residents, non-residents, organizations, city officials, and managers) with appropriate access controls.
 
+FOR FINAL REPORT GO TO design
+
 ## Features
 - User management with different user types
 - Reservation scheduling and management
