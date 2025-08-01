@@ -1,0 +1,10 @@
+Manager|1|manager|password|Admin|admin@convention.com
+Resident|2|resident1|password|John Doe|john@example.com
+NonResident|3|nonresident1|password|Jane Smith|jane@example.com
+Organization|4|organization1|password|Acme Corp|info@acme.com
+City|5|city1|password|Public Works|works@citygovt.com
+Resident|6|resident2|password|Mark Wilson|mark@example.com
+Organization|7|organization2|password|Tech Summit|info@techsummit.com
+NonResident|8|nonresident2|password|Sarah Johnson|sarah@example.com
+Resident|9|resident3|password|Emily Davis|emily@example.com
+NonResident|10|nonresident3|password|Mike Brown|mike@example.com
